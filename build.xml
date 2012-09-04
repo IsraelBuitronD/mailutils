@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="mailutils" default="compile" basedir=".">
+        
+    <property environment="env"/>     
+    <property name="src.dir" value="src"/>
+    <property name="bin.dir" value="bin"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="jars.dir" value="lib"/>
+
+    <target name="clean" >
+      <delete verbose="true" includeemptydirs="true">
+	<fileset dir="${basedir}">
+	  <exclude name="${src.dir}/**" />
+	  <exclude name="${jars.dir}/**"/>
+	  <exclude name=".git" />
+	  <exclude name="samples" />
+	  <exclude name="build.xml" />
+	  <exclude name="README.md" />
+	  <include name="**/*" />
+	</fileset>
+      </delete>
+    </target>
+
+    <target name="prepare_classpath">
+      <path id="jars.path">
+	<fileset dir="${jars.dir}">
+	  <include name="**/*.jar"/>
+	</fileset>
+      </path>
+      <property refid="jars.path" name="classpath"/>
+    </target>
+
+    <target name="compile" depends="prepare_classpath">
+      <mkdir dir="${bin.dir}" />
+      <javac verbose="false" 
+	     deprecation="on"
+	     debug="on"
+	     debuglevel="lines,vars,source"
+	     destdir="${bin.dir}" 
+	     classpath="${env.CLASSPATH}:${classpath}" 
+	     srcdir="${src.dir}">
+      </javac>
+    </target>
+
+    <target name="bin_dist" depends="compile">
+      <mkdir dir="${dist.dir}"/>
+      <jar destfile="${dist.dir}/mailutils-bin.jar"
+	   level="9"
+	   excludes="${bin.dir}/Test**">
+	<fileset dir="${bin.dir}">
+	  <!-- <exclude name="${bin.dir}/Test**"/> -->
+	</fileset>
+      </jar>
+    </target>
+
+    <target name="src_dist">
+      <mkdir dir="${dist.dir}"/>
+      <tar destfile="${dist.dir}/mailutils-src.tar.bz2"
+	   compression="bzip2">     
+	<tarfileset dir="${basedir}"
+		    preserveLeadingSlashes="true"
+		    prefix="mailutils">
+	  <include name="${src.dir}/**"/>
+	  <include name="build.xml"/>
+	</tarfileset>
+      </tar>
+
+    </target>
+
+</project>
